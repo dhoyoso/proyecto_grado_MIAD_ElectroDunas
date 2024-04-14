@@ -109,6 +109,10 @@ H5, H3 {
     background-color: #252e3f;
 }
 
+#descriptive_graphs {
+    background-color: #252e3f;
+    margin-bottom: 1.2%;
+}
 
 
 #model_graph > b, #cpd_card > b {
@@ -139,6 +143,10 @@ H5, H3 {
 #header_wait_time_min > b, #header_care_score > b {
     display: table-cell;
     vertical-align: middle;
+}
+
+#selection-div {
+    margin-bottom: 100px;
 }
 
 /* Dropdown
