@@ -231,7 +231,8 @@ def generate_control_card():
                                 min_date_allowed=min(data.index.date),
                                 max_date_allowed=max(data.index.date),
                                 #initial_visible_month=max(data.index.date),
-                                date=min(data.index.date)#-dt.timedelta(days=7)
+                                date=min(data.index.date),#-dt.timedelta(days=7)
+                                display_format='DD/MM/YYYY'
                             )
                         ],
                         style=dict(width='30%')
@@ -270,7 +271,8 @@ def generate_control_card():
                                 min_date_allowed=min(data.index.date),
                                 max_date_allowed=max(data.index.date),
                                 #initial_visible_month=max(data.index.date),
-                                date=max(data.index.date) #-dt.timedelta(days=7)
+                                date=max(data.index.date), #-dt.timedelta(days=7)
+                                display_format='DD/MM/YYYY'
                             )
                         ],
                         style=dict(width='30%')
@@ -443,8 +445,11 @@ def actualizar_graficos_y_contadores(client, sector, initial_date, end_date, ini
         ],
         'layout': {
             'title': title_bar,
-            'xaxis': {'title': 'Cliente'},
-            'yaxis': {'title': f'Consumo total de energía activa en las <br> fechas y horas seleccionadas'} # del {initial_date} <br> a las {initial_hour} horas al <br> {end_date} a las {end_hour} horas'},
+            'xaxis': {'title': 'Cliente', 'showgrid': True, 'gridcolor': '#FFFFFF'},
+            'yaxis': {'title': f'Consumo total de energía activa en las <br> fechas y horas seleccionadas', 'showgrid': True, 'gridcolor': '#FFFFFF'}, # del {initial_date} <br> a las {initial_hour} horas al <br> {end_date} a las {end_hour} horas'},
+            'plot_bgcolor': '#252e3f',  # Dark blue background color
+            'paper_bgcolor': '#252e3f',  # Consistent with plot background
+            'font': {'color': '#FFFFFF'}  # White font for better readability
         }
     }
 
@@ -488,11 +493,16 @@ def actualizar_graficos_y_contadores(client, sector, initial_date, end_date, ini
                     dict(count=1, label="1m", step="month", stepmode="backward"),
                     dict(count=6, label="6m", step="month", stepmode="backward"),
                     dict(label = "Todo", step="all")
-                ])
+                ]),
+            bgcolor='#1f2630',  # Custom background color for buttons
+            font=dict(color='#FFFFFF'),  # Button text color
             ),
             rangeslider=dict(visible=True),
             type="date"
-        )
+        ),
+        plot_bgcolor = '#252e3f',  # Dark blue background color
+        paper_bgcolor = '#252e3f',  # Consistent with plot background
+        font = {'color': '#FFFFFF'}  # White font for better readability
     )
 
     consumo_total = str(round(df_filtrado_area['Active_energy'].sum(),2)) + " [kWh]"
