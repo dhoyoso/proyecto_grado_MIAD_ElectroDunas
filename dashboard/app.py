@@ -252,7 +252,10 @@ def generate_control_card():
             html.Div([html.B(id = 'consumo-total-title', children = "Total consumo de energía activa:", style=dict(width='75%')), html.P(" ",style=dict(width='3%', textAlign='center')), html.P(id = 'consumo-total-value', children = "100 kWh", style=dict(width='25%'))], style = dict(display='flex', margin='1%')),
             html.Div([html.B(id = 'franja-consumo-title', children = "Franja horaria con mayor consumo del cliente:", style=dict(width='75%')), html.P(" ",style=dict(width='3%', textAlign='center')), html.P(id = 'franja-consumo-value', children = "8 am - 5 pm", style=dict(width='25%'))], style = dict(display='flex', margin='1%')),
             html.Div([html.B(id = 'datos-anomalos-title', children = "Total datos anomalos del cliente:", style=dict(width='75%')), html.P(" ",style=dict(width='3%', textAlign='center')), html.P(id = 'datos-anomalos-value', children = "200", style=dict(width='25%'))], style = dict(display='flex', margin='1%')),
-            html.Div([html.B(id = 'mape-modelo-title', children = "Error (MAPE) del pronóstico del consumo del cliente:", style=dict(width='75%')), html.P(" ",style=dict(width='3%', textAlign='center')), html.P(id = 'mape-modelo-value', children = "9%", style=dict(width='25%'))], style = dict(display='flex', margin='1%'))
+            html.Div([html.B(id = 'mape-modelo-title', children = "Error (MAPE) del pronóstico del consumo del cliente:", style=dict(width='75%')), html.P(" ",style=dict(width='3%', textAlign='center')), html.P(id = 'mape-modelo-value', children = "9%", style=dict(width='25%'))], style = dict(display='flex', margin='1%')),
+            html.Br(),
+            html.Br(),
+            html.Div([html.B(id = 'alert-title', className='alert', children = "", style=dict(width='100%', textAlign='center'))], style = dict(display='flex', margin='1%'))
         ]
     )
 
@@ -459,7 +462,7 @@ def actualizar_graficos_y_contadores(client, sector, initial_date, end_date, ini
 
 
 @app.callback(
-    [Output("plot_series", "figure"), Output("mape-modelo-value", "children"), Output("datos-anomalos-value", "children")],
+    [Output("plot_series", "figure"), Output("mape-modelo-value", "children"), Output("datos-anomalos-value", "children"), Output("alert-title", "children")],
     [Input("datepicker-inicial", "date"),
     Input("dropdown-hora-inicial-hora", "value"),
     Input('client-dropdown-control', 'value'), 
@@ -481,7 +484,7 @@ def update_output_div(date, hour, client, end_date, end_hour):
             client_data['Fecha'] = pd.to_datetime(client_data['Fecha'])
             client_data.set_index('Fecha', inplace=True)
             traces = True
-            mape = str(round(calculate_mape(client_data['Active_energy'], client_data['Predictions']), 2))+'%'
+            mape = round(calculate_mape(client_data['Active_energy'], client_data['Predictions']), 2)
 
             # Filter for anomalies
             anomalies_below = client_data[client_data['Active_energy'] < client_data['Lower_Bound']]
@@ -493,16 +496,25 @@ def update_output_div(date, hour, client, end_date, end_hour):
 
             # Total anomalies
             total_anomalies = count_anomalies_below + count_anomalies_above
+
+            valid_predictions = client_data['Predictions'].notna().sum()
+
+            if total_anomalies/valid_predictions>0.2:
+                alert_title = 'ALERTA DE CONSUMO ANOMALO'
+            else:
+                alert_title = ''
             
+
         else:
             client_data = data[data["Cliente"] == client]
             total_anomalies = 'Selecciona un Cliente'
             mape = 'Selecciona un Cliente'
             traces = False
+            alert_title = ''
 
         # Graficar
         plot = plot_series(client_data, initial_date, traces)
-        return plot, mape, total_anomalies
+        return plot, mape, total_anomalies, alert_title
 
 
 # Run the server

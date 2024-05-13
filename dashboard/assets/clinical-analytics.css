@@ -207,6 +207,11 @@ H5, H3 {
     background-color: #252e3f !important;
 }
 
+.alert {
+    color: rgb(255, 0, 0);
+    font-size: 24px; /* Large font size, adjust as needed */
+  }
+
 /* Slider
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
