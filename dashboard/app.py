@@ -18,10 +18,10 @@ app = dash.Dash(
 )
 app.title = "ElectroDunas"
 
-# URL del repositorio en GitHub
-REPO_URL = 'https://api.github.com/repos/Pacheco-Carvajal/GPA-Data-ElectroDunas/contents/'
-SECTOR_DATA_FILE_URL = 'https://github.com/Pacheco-Carvajal/GPA-Data-ElectroDunas/raw/main/sector_economico_clientes.xlsx'
-
+# Ruta con los datos pre procesados utilizados en los diagramas descriptivos históricos.
+PREPROCESSED_DATA_PATH = "../data/preprocessed.csv"
+# Ruta con los datos de los consumos y pronósticos de los clientes.
+CONSUMPTION_AND_PREDICION_DATA_PATH = "../data/"
 
 server = app.server
 app.config.suppress_callback_exceptions = True
@@ -38,108 +38,59 @@ def generate_random_color(n):
     return color_list
 
 # Load data from csv
-def load_data(repo_url, sector_data_url):
-    result_df = pd.read_csv("preprocessed.csv")
-
-    # Haz una solicitud GET a la API de GitHub para obtener la lista de archivos en el directorio
-    # response = requests.get(repo_url)
-    # file_data = response.json()
-
-    # # Filtra los archivos que contienen "datos cliente" en su nombre
-    # desired_files = [(file['download_url'], file['name']) for file in file_data if 'DATOSCLIENTE' in file['name']]
-
-    # # Crea un DataFrame combinando todos los archivos encontrados
-    # dfs = []
-    # for file_url, file_name in desired_files:
-    #     response = requests.get(file_url)
-    #     content = response.content.decode('utf-8')
-    #     df = pd.read_csv(StringIO(content))
-
-    #     # Agrega una columna "fuente" con el nombre del archivo
-    #     df['fuente'] = file_name
-
-    #     dfs.append(df)
-
-    # # Concatena los DataFrames en uno solo
-    # client_sector_df = pd.concat(dfs, ignore_index=True)
-
-    # #print(client_sector_df)
-
-    # # Cargar el archivo Excel en un DataFrame
-    # sectores = pd.read_excel(sector_data_url)
-
-    # #print(sectores)
-
-    # # Extraer los números de la columna 'fuente'
-    # client_sector_df['fuente'] = client_sector_df['fuente'].str.extract('(\d+)')
-
-    # # Concatenar 'Cliente' con los números extraídos
-    # client_sector_df['fuente'] = 'Cliente ' + client_sector_df['fuente']
-
-    # #print(client_sector_df)
-
-    # client_sector_df = client_sector_df.rename(columns={'fuente': 'Cliente'})
-    # sectores = sectores.rename(columns={'Cliente:': 'Cliente'})
-    # sectores['Cliente'] = sectores['Cliente'].str.strip()
-
-    # result_df = pd.merge(client_sector_df, sectores[['Cliente', 'Sector Económico:']], on='Cliente', how='left')
-
-    # result_df = result_df.rename(columns={'Sector Económico:': 'Sector'})
+def load_data(data_path):
+    result_df = pd.read_csv(data_path)
 
     result_df['Fecha'] = pd.to_datetime(result_df['Fecha'])
     result_df.set_index('Fecha', inplace=True)
 
-    # print(result_df)
-    # print(result_df['Sector'].unique())
-
-    # result_df.to_csv("./preprocessed.csv")
-    #print(result_df)
     return result_df
 
 # Cargar datos
-data = load_data(REPO_URL, SECTOR_DATA_FILE_URL)
+data = load_data(PREPROCESSED_DATA_PATH)
 
 # Graficar serie
-def plot_series(data, initial_date, proy):
-
+def plot_series(data, initial_date, traces = False):
     data_plot = data.loc[initial_date:]
-    data_plot = data_plot[:-(120-proy)]
-    fig = go.Figure([
-        go.Scatter(
+
+    figures = [go.Scatter(
             name='Demanda energética',
             x=data_plot.index,
             y=data_plot['Active_energy'],
             mode='lines',
             line=dict(color="#188463"),
-        ),
-        #go.Scatter(
-        #    name='Proyección',
-        #    x=data_plot.index,
-        #    y=data_plot['forecast'],
-        #    mode='lines',
-        #    line=dict(color="#bbffeb",),
-        #),
-        #go.Scatter(
-        #    name='Upper Bound',
-        #    x=data_plot.index,
-        #    y=data_plot['Upper bound'],
-        #    mode='lines',
-        #    marker=dict(color="#444"),
-        #    line=dict(width=0),
-        #    showlegend=False
-        #),
-        #go.Scatter(
-        #    name='Lower Bound',
-        #    x=data_plot.index,
-        #    y=data_plot['Lower bound'],
-        #    marker=dict(color="#444"),
-        #    line=dict(width=0),
-        #    mode='lines',
-        #    fillcolor="rgba(242, 255, 251, 0.3)",
-        #    fill='tonexty',
-        #    showlegend=False
-        #)
-    ])
+        )]
+    
+    if traces:
+        figures.append(go.Scatter(
+           name='Proyección',
+           x=data_plot.index,
+           y=data_plot['Predictions'],
+           mode='lines',
+           line=dict(color="#bbffeb",),
+        ))
+        figures.append(go.Scatter(
+           name='Upper Bound',
+           x=data_plot.index,
+           y=data_plot['Upper_Bound'],
+           mode='lines',
+           marker=dict(color="#444"),
+           line=dict(width=0),
+           showlegend=False
+        ))
+        figures.append(go.Scatter(
+           name='Lower Bound',
+           x=data_plot.index,
+           y=data_plot['Lower_Bound'],
+           marker=dict(color="#444"),
+           line=dict(width=0),
+           mode='lines',
+           fillcolor="rgba(242, 255, 251, 0.3)",
+           fill='tonexty',
+           showlegend=False
+        ))
+
+    fig = go.Figure(figures)
 
     fig.update_layout(
         legend=dict(
@@ -294,25 +245,6 @@ def generate_control_card():
                     ),
                 ],
                 style=dict(display='flex', margin='1%')
-            ),
-
-            html.Br(),
-
-            # Slider proyección
-            html.Div(
-                id="campo-slider",
-                children=[
-                    html.P("Ingrese horas a proyectar:"),
-                    dcc.Slider(
-                        id="slider-proyeccion",
-                        min=0,
-                        max=119,
-                        step=1,
-                        value=0,
-                        marks=None,
-                        tooltip={"placement": "bottom", "always_visible": True},
-                    )
-                ]
             ),
             html.Br(),
             # html.Hr(),
@@ -530,24 +462,31 @@ def actualizar_graficos_y_contadores(client, sector, initial_date, end_date, ini
     Output("plot_series", "figure"),
     [Input("datepicker-inicial", "date"),
     Input("dropdown-hora-inicial-hora", "value"),
-    Input("slider-proyeccion", "value"), 
     Input('client-dropdown-control', 'value'), 
     Input('datepicker-final', 'date'), 
     Input('dropdown-hora-final-hora', 'value')]
 )
-def update_output_div(date, hour, proy, client, end_date, end_hour):
+def update_output_div(date, hour, client, end_date, end_hour):
 
-    if ((date is not None) & (hour is not None) & (proy is not None)):
+    if ((date is not None) & (hour is not None)):
         hour = str(hour)
         minute = str(0)
 
         initial_date = date + " " + hour + ":" + minute
         initial_date = pd.to_datetime(initial_date, format="%Y-%m-%d %H:%M")
 
-        client_data = data[data["Cliente"] == client]
+        if client != 'todos':
+            client_data = pd.read_excel(CONSUMPTION_AND_PREDICION_DATA_PATH+client+'.xlsx')
+
+            client_data['Fecha'] = pd.to_datetime(client_data['Fecha'])
+            client_data.set_index('Fecha', inplace=True)
+            traces = True
+        else:
+            client_data = data[data["Cliente"] == client]
+            traces = False
 
         # Graficar
-        plot = plot_series(client_data, initial_date, int(proy))
+        plot = plot_series(client_data, initial_date, traces)
         return plot
 
 
