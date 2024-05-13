@@ -6,9 +6,6 @@ import plotly.graph_objs as go
 import numpy as np
 import pandas as pd
 import datetime as dt
-import requests
-from io import BytesIO
-from io import StringIO
 import random
 import colorsys
 
@@ -36,6 +33,9 @@ def generate_random_color(n):
         color = "#{:02x}{:02x}{:02x}".format(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255))
         color_list.append(color)
     return color_list
+
+def calculate_mape(actual, predicted):
+    return (abs((actual - predicted) / actual)).mean() * 100
 
 # Load data from csv
 def load_data(data_path):
@@ -250,8 +250,8 @@ def generate_control_card():
             # html.Hr(),
             html.Br(),
             html.Div([html.B(id = 'consumo-total-title', children = "Total consumo de energía activa:", style=dict(width='75%')), html.P(" ",style=dict(width='3%', textAlign='center')), html.P(id = 'consumo-total-value', children = "100 kWh", style=dict(width='25%'))], style = dict(display='flex', margin='1%')),
-            html.Div([html.B(id = 'datos-anomalos-title', children = "Total datos anomalos del cliente:", style=dict(width='75%')), html.P(" ",style=dict(width='3%', textAlign='center')), html.P(id = 'datos-anomalos-value', children = "200", style=dict(width='25%'))], style = dict(display='flex', margin='1%')),
             html.Div([html.B(id = 'franja-consumo-title', children = "Franja horaria con mayor consumo del cliente:", style=dict(width='75%')), html.P(" ",style=dict(width='3%', textAlign='center')), html.P(id = 'franja-consumo-value', children = "8 am - 5 pm", style=dict(width='25%'))], style = dict(display='flex', margin='1%')),
+            html.Div([html.B(id = 'datos-anomalos-title', children = "Total datos anomalos del cliente:", style=dict(width='75%')), html.P(" ",style=dict(width='3%', textAlign='center')), html.P(id = 'datos-anomalos-value', children = "200", style=dict(width='25%'))], style = dict(display='flex', margin='1%')),
             html.Div([html.B(id = 'mape-modelo-title', children = "Error (MAPE) del pronóstico del consumo del cliente:", style=dict(width='75%')), html.P(" ",style=dict(width='3%', textAlign='center')), html.P(id = 'mape-modelo-value', children = "9%", style=dict(width='25%'))], style = dict(display='flex', margin='1%'))
         ]
     )
@@ -459,7 +459,7 @@ def actualizar_graficos_y_contadores(client, sector, initial_date, end_date, ini
 
 
 @app.callback(
-    Output("plot_series", "figure"),
+    [Output("plot_series", "figure"), Output("mape-modelo-value", "children"), Output("datos-anomalos-value", "children")],
     [Input("datepicker-inicial", "date"),
     Input("dropdown-hora-inicial-hora", "value"),
     Input('client-dropdown-control', 'value'), 
@@ -481,13 +481,28 @@ def update_output_div(date, hour, client, end_date, end_hour):
             client_data['Fecha'] = pd.to_datetime(client_data['Fecha'])
             client_data.set_index('Fecha', inplace=True)
             traces = True
+            mape = str(round(calculate_mape(client_data['Active_energy'], client_data['Predictions']), 2))+'%'
+
+            # Filter for anomalies
+            anomalies_below = client_data[client_data['Active_energy'] < client_data['Lower_Bound']]
+            anomalies_above = client_data[client_data['Active_energy'] > client_data['Upper_Bound']]
+
+            # Count anomalies
+            count_anomalies_below = anomalies_below.shape[0]
+            count_anomalies_above = anomalies_above.shape[0]
+
+            # Total anomalies
+            total_anomalies = count_anomalies_below + count_anomalies_above
+            
         else:
             client_data = data[data["Cliente"] == client]
+            total_anomalies = 'Selecciona un Cliente'
+            mape = 'Selecciona un Cliente'
             traces = False
 
         # Graficar
         plot = plot_series(client_data, initial_date, traces)
-        return plot
+        return plot, mape, total_anomalies
 
 
 # Run the server
