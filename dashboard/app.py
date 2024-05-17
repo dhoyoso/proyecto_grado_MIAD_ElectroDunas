@@ -144,7 +144,7 @@ def generate_control_card():
                     dcc.Dropdown(
                         id='client-dropdown-control',
                         options=[{'label': "todos", 'value': "todos"}] + [
-                            {'label': cliente, 'value': cliente} for cliente in data['Cliente'].unique() if pd.notna(cliente)
+                            {'label': cliente, 'value': cliente} for cliente in sorted(data['Cliente'].unique()) if pd.notna(cliente)
                         ],
                         value="todos",  # Valor predeterminado: "todos"
                         style={'width': '100%'}

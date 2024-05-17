@@ -13,9 +13,9 @@ $SSHCommand = @"
 sudo yum install git -y  # Ensure git is installed
 
 # Clone the repository
-if [ ! -d "$ServerDirectory" ]; then
-    git clone $GitRepository
-fi
+rm -rf proyecto_grado_MIAD_ElectroDunas
+
+git clone $GitRepository
 
 cd $ServerDirectory/dashboard  # Navigate to the repository directory
 
