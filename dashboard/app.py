@@ -16,9 +16,9 @@ app = dash.Dash(
 app.title = "ElectroDunas"
 
 # Ruta con los datos pre procesados utilizados en los diagramas descriptivos históricos.
-PREPROCESSED_DATA_PATH = "../data/preprocessed.csv"
+PREPROCESSED_DATA_PATH = "data/preprocessed.csv"
 # Ruta con los datos de los consumos y pronósticos de los clientes.
-CONSUMPTION_AND_PREDICION_DATA_PATH = "../data/"
+CONSUMPTION_AND_PREDICION_DATA_PATH = "data/"
 
 server = app.server
 app.config.suppress_callback_exceptions = True
