@@ -58,4 +58,4 @@ result_df.set_index('Fecha', inplace=True)
 # print(result_df)
 # print(result_df['Sector'].unique())
 
-result_df.to_csv("./data/preprocessed.csv")
+result_df.to_csv("./dashboard/data/preprocessed.csv")
