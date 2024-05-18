@@ -164,7 +164,6 @@ Y se describen a continuación:
  ┣ 📄 load_train_predict_LSTM_XGB.ipynb --> Notebook para cargar datos del repo origen, entrenar modelos LSTM y XGB para cada cliente, genera los pronósticos y guarda un csv por cada cliente en la carpeta data del dashboard.
  ┣ 📄 load_and_preprocess_data.py --> Script para cargar datos del repo origen, pre procesarlos y ponerlos en la carpeta data para las visualizaciones históricas.
  ┣ 📄 exploratory_data_analysis.ipynb --> Notebook con el Análisis exploratorio de datos realizado.
- ┣ 📄 electrodunas-key-pair.pem --> Archivo .pem utilizado para conectarse con la instancia del tablero actualmente desplegado.
  ┣ 📄 ec2_deploy.ps1 --> PowerShell script para conectarse a la máquina, instalar dependencias, clonar repo y desplegar tablero en aws ec2.
  ┣ 📄 best_models.xlsx --> Archivo xslx con los mejores modelos por cada cliente (modelo, hiperparametros, etc.).
  ┣ 📄 best_3_models.xlsx --> Archivo xslx con los mejores 3 modelos por cada cliente (modelo, hiperparametros, etc.).
