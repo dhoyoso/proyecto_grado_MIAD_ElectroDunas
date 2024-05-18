@@ -150,7 +150,7 @@ Prototipo:
 Real:
 ![alt text](<images/Dashboard Image 2.png>)
 Arquitectura:
-![alt text](images/image-6.png)
+![alt text](images/Arquitectura)
 
 ### Reporte técnico de experimentos
 [Consulta el reporte técnico de experimentos aquí](./anexos/Reporte%20de%20selección%20y%20parametrización%20de%20modelos.pdf)
