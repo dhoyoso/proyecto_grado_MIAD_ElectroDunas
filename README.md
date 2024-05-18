@@ -127,9 +127,11 @@ Para actualizar o cargar nuevos datos, es necesario que estos datos sean cargado
 De lo contrario, será necesario crear un repositorio con esa misma estructura y poner los nuevos datos en dicha estructura, además de reemplazar en los archivos [load_and_preprocess_data.py](./load_and_preprocess_data.py) y [load_train_predict_LSTM_XGB.ipynb](./load_train_predict_LSTM_XGB.ipynb) la url del repositorio de origen puesto que el primero descarga y preprocesa los datos para los gráficos históricos dejando su resultado en el archivo [dashboard/data/preprocessed.csv](./dashboard/data/preprocessed.csv) y el segundo descarga, entrena los modelos LSTM y XGB y cálcula el pronóstico y umbrales de cada cliente y los almacena en archivos csv individuales por cliente en la carpeta [dashboard/data](./dashboard/data).
 
 Urls a actualizar en script:
+
 ![alt text](images/image-1.png)
 
 Urls a actualizar en Notebook:
+
 ![alt text](images/image-2.png)
 ![alt text](images/image-3.png)
 
