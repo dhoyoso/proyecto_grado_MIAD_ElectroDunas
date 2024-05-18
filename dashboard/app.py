@@ -502,7 +502,7 @@ def update_output_div(date, hour, client, end_date, end_hour):
             valid_predictions = client_data['Predictions'].notna().sum()
 
             if total_anomalies/valid_predictions>0.2:
-                alert_title = 'ALERTA DE CONSUMO ANOMALO'
+                alert_title = 'ALERTA DE ANOMALÍAS CRÍTICAS'
             else:
                 alert_title = ''
             
