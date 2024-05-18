@@ -456,6 +456,8 @@ def actualizar_graficos_y_contadores(client, sector, initial_date, end_date, ini
     max_value = rolling_sum.max()
 
     title_franja_horaria = "Franja de 4 horas con mayor consumo de los clientes:" if "todos" == client else f"Franja horaria con mayor consumo del {client.lower()}:"
+    if max_period_start >= 20:
+        max_period_start = 20
     franja_horaria = f"{max_period_start} - {max_period_start+4}"
 
     return fig_bar, sector, fig_area, series_plot_title, consumo_total, title_franja_horaria, franja_horaria
