@@ -14,7 +14,7 @@ para mejorar la eficiencia energética, reducir las pérdidas técnicas, y mejor
 
 ### Link a este repositorio (en caso de exportar está guía) y Link a la herramienta previamente desplegada en AWS
 * [**Repositorio**](https://github.com/dhoyoso/proyecto_grado_MIAD_ElectroDunas)
-* [**Herramienta desplegada en AWS (para su uso y evaluación)**](PDTE)
+* [**Herramienta desplegada en AWS (para su uso y evaluación)**](http://ec2-3-208-19-151.compute-1.amazonaws.com:8000/)
 
 ### Solución, usuarios y usos
 
