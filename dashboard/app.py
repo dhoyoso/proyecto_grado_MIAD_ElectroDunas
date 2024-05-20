@@ -319,7 +319,7 @@ app.layout = html.Div(
 
 # Crea una función de callback para actualizar los gráficos y contadores en función de las selecciones en los menús desplegables
 @app.callback(
-    [Output('bar-chart', 'figure'), Output('sector-dropdown-control', 'value'), Output('area-chart', 'figure'), Output('series-plot-title', 'children'), Output('consumo-total-value', 'children'), Output('franja-consumo-title', 'children') ,Output('franja-consumo-value', 'children')],
+    [Output('bar-chart', 'figure'), Output('sector-dropdown-control', 'value'), Output('area-chart', 'figure'), Output('consumo-total-value', 'children'), Output('franja-consumo-title', 'children') ,Output('franja-consumo-value', 'children')],
     [Input('client-dropdown-control', 'value'), Input('sector-dropdown-control', 'value'), Input('datepicker-inicial', 'date'), Input('datepicker-final', 'date'), Input('dropdown-hora-inicial-hora', 'value'), Input('dropdown-hora-final-hora', 'value')]
 )
 def actualizar_graficos_y_contadores(client, sector, initial_date, end_date, initial_hour, end_hour):
@@ -336,7 +336,6 @@ def actualizar_graficos_y_contadores(client, sector, initial_date, end_date, ini
         data_w_fecha_col = data.reset_index()
 
     if client == 'todos' or client == None:
-        series_plot_title = "Por favor selecciona un cliente para ver la Demanda energética, pronóstico y anomalías [kWh]"
 
         if sector == 'todos' or sector == None:
             df_filtrado = data_w_fecha_col
@@ -352,7 +351,6 @@ def actualizar_graficos_y_contadores(client, sector, initial_date, end_date, ini
             title_area = f'Total voltajes FA y FC por clientes del sector <br> {sector}'
 
     else:
-        series_plot_title = f"Demanda energética, pronóstico y anomalías del {client}"
 
         sector = data_w_fecha_col[data_w_fecha_col['Cliente'] == client].iloc[0]['Sector']
         df_filtrado = data_w_fecha_col[data_w_fecha_col['Sector'] == sector]
@@ -460,11 +458,11 @@ def actualizar_graficos_y_contadores(client, sector, initial_date, end_date, ini
         max_period_start = 20
     franja_horaria = f"{max_period_start} - {max_period_start+4}"
 
-    return fig_bar, sector, fig_area, series_plot_title, consumo_total, title_franja_horaria, franja_horaria
+    return fig_bar, sector, fig_area, consumo_total, title_franja_horaria, franja_horaria
 
 
 @app.callback(
-    [Output("plot_series", "figure"), Output("mape-modelo-value", "children"), Output("datos-anomalos-value", "children"), Output("alert-title", "children")],
+    [Output("plot_series", "figure"), Output("mape-modelo-value", "children"), Output("datos-anomalos-value", "children"), Output("alert-title", "children"),  Output('series-plot-title', 'children')],
     [Input("datepicker-inicial", "date"),
     Input("dropdown-hora-inicial-hora", "value"),
     Input('client-dropdown-control', 'value'), 
@@ -481,10 +479,17 @@ def update_output_div(date, hour, client, end_date, end_hour):
         initial_date = pd.to_datetime(initial_date, format="%Y-%m-%d %H:%M")
 
         if client != 'todos':
+            
+
             client_data = pd.read_excel(CONSUMPTION_AND_PREDICION_DATA_PATH+client+'.xlsx')
 
             client_data['Fecha'] = pd.to_datetime(client_data['Fecha'])
             client_data.set_index('Fecha', inplace=True)
+
+            frequency = pd.infer_freq(client_data.index)
+
+            series_plot_title = f"Demanda energética, pronóstico y anomalías del {client} con frecuencia de {frequency.replace('D', ' día(s)').replace('h',' hora(s)')}"
+
             traces = True
             mape = round(calculate_mape(client_data['Active_energy'], client_data['Predictions']), 2)
 
@@ -508,6 +513,7 @@ def update_output_div(date, hour, client, end_date, end_hour):
             
 
         else:
+            series_plot_title = "Por favor selecciona un cliente para ver la Demanda energética, pronóstico y anomalías [kWh]"
             client_data = data[data["Cliente"] == client]
             total_anomalies = 'Selecciona un Cliente'
             mape = 'Selecciona un Cliente'
@@ -516,7 +522,7 @@ def update_output_div(date, hour, client, end_date, end_hour):
 
         # Graficar
         plot = plot_series(client_data, initial_date, traces)
-        return plot, mape, total_anomalies, alert_title
+        return plot, mape, total_anomalies, alert_title, series_plot_title
 
 
 # Run the server

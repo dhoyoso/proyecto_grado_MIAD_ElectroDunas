@@ -1,5 +1,5 @@
 # Define connection parameters
-$EC2Address = "ec2-user@ec2-3-93-181-164.compute-1.amazonaws.com"  # Include username
+$EC2Address = "ec2-user@ec2-3-208-19-151.compute-1.amazonaws.com"  # Include username
 $KeyPath = "C:\Users\dhoyoso\Documents\Maestria UNIANDES\Cursos\PROYECTO APLICADO\electrodunas-key-pair.pem"  # Path to your private key file
 
 # Define repository and server details
