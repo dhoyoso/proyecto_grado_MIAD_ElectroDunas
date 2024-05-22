@@ -186,11 +186,5 @@ Y se describen a continuación:
  ┃ ┗ 📄 requirements.txt --> Archivo de requerimientos o dependencias de python necesarias para correr el tablero.
 ```
 
-### Rúbrica de evaluación diligenciada
-PDTE NO SE A QUÉ SE REFIERE.
-
-# Rúbrica de pruebas diligenciada como resultado de validación del prototipo
-PDTE POR IMPLEMENTAR.
-
-# Video - Pitch
-PDTE POR IMPLEMENTAR.
+# Rúbrica de pruebas diligenciada como resultado de validación del prototipo (Módulo 1)
+[Rúbrica de pruebas del módulo 1 como resultado de validación del prototipo](./anexos/Modulo%201%20-%20tabla%20de%20requisitos.pdf)
